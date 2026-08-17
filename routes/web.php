@@ -2,17 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\DB;
 
-
-use App\Http\Controllers\BookController;
-
-Route::get('/books', [BookController::class, 'index'])
-    ->name('books.index');
-
-Route::get('/books/create', [BookController::class, 'create'])
-    ->name('books.create');
-    
+// หน้าแรกและหน้าทั่วไป
 Route::get('/', function () {
     return view('index');
 });
@@ -20,56 +13,30 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return view('about');
 });
-Route::get('/form', function () {
-    return view('form');
-});
 
 Route::get('/blog', function () {
     return view('blog');
 });
 
-Route::get('/blogs', function () {
-    $blogs = [
-        [
-            'title' => 'บทความที่ 1',
-            'content' => 'เนื้อหาบทความที่ 1',
-            'status' =>true
-        ],
-        [
-            'title' => 'บทความที่ 2',
-            'content' => 'เนื้อหาบทความที่ 2',
-            'status' =>true
-        ],
-        [
-            'title' => 'บทความที่ 3',
-            'content' => 'เนื้อหาบทความที่ 3',
-            'status' =>false
-        ]
-    ];
-    return view('blogs',compact('blogs'));
-})->name('blogs');
-
-Route::get('/abouts', function () {
-    $name = 'Hathaiphat Phakdeekaew';
-    $date = '6 กรกฎาคม 2026';
-
-    return view('abouts',compact('name','date'));
-})->name('abouts');
-
 Route::get('/student/{id}', function ($id) {
     return view('student', ['id' => $id]);
 })->name('student.profile');
 
-Route::fallback(function () {
-    return 'ไม่พบหน้าเว็บ';
-});
+// การจัดการ Books
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
 
+// การจัดการ Blogs & Admin
 Route::get('/abouts', [AdminController::class, 'abouts'])->name('abouts');
 Route::get('/blogs', [AdminController::class, 'blogs'])->name('blogs');
 Route::get('/create', [AdminController::class, 'create'])->name('create');
-Route::get('/form', [AdminController::class, 'form'])->name('form');
-Route::post('/insert', [AdminController::class, 'insert']);
+Route::post('/insert', [AdminController::class, 'insert'])->name('insert');
+Route::get('/change/{id}', [AdminController::class, 'change'])->name('change');
+Route::get('/edit/{id}', [AdminController::class, 'edit'])->name('edit');
+Route::match(['post', 'put'], '/update/{id}', [AdminController::class, 'update'])->name('update');
+Route::get('/delete/{id}', [AdminController::class, 'delete'])->name('delete');
 
+// ทดสอบเชื่อมต่อฐานข้อมูล
 Route::get('/test-db', function () {
     try {
         DB::connection()->getPdo();
@@ -79,4 +46,7 @@ Route::get('/test-db', function () {
     }
 });
 
-Route::get('/delete/{id}', [AdminController::class, 'delete'])->name('delete');
+// Fallback Route (ต้องอยู่ล่างสุดเสมอ)
+Route::fallback(function () {
+    return 'ไม่พบหน้าเว็บ';
+});

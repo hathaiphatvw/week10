@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มบทความใหม่</title>
+    <title>แก้ไขบทความ - {{ $blog->title }}</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -190,13 +190,14 @@
     <div class="header">
         <span class="header-icon">✍️</span>
         <div>
-            <h1>เขียนบทความใหม่</h1>
-            <div class="subtitle">บันทึกเรื่องราว ความคิด หรือสาระประโยชน์ดีๆ</div>
+            <h1>แก้ไขบทความ</h1>
+            <div class="subtitle">ปรับปรุงข้อมูลและเนื้อหาบทความของคุณ (#{{ sprintf('%03d', $blog->id) }})</div>
         </div>
     </div>
 
-    <form action="/insert" method="POST">
+    <form action="{{ route('update', $blog->id) }}" method="POST">
         @csrf
+        @method('PUT')
 
         <!-- ชื่อบทความ -->
         <div class="form-group">
@@ -205,7 +206,7 @@
                 type="text"
                 id="title"
                 name="title"
-                value="{{ old('title') }}"
+                value="{{ old('title', $blog->title) }}"
                 placeholder="กรอกชื่อบทความหรือหัวข้อหลัก"
             >
             @error('title')
@@ -220,7 +221,7 @@
                 id="content"
                 name="content"
                 placeholder="แบ่งปันข้อมูล รายละเอียด หรือเนื้อหาของคุณที่นี่..."
-            >{{ old('content') }}</textarea>
+            >{{ old('content', $blog->content) }}</textarea>
             @error('content')
                 <div class="error">{{ $message }}</div>
             @enderror
@@ -228,11 +229,11 @@
 
         <!-- ปุ่มควบคุม -->
         <div class="button-group">
-            <a href="/blogs" class="btn btn-back">
+            <a href="{{ route('blogs') }}" class="btn btn-back">
                 ยกเลิก
             </a>
             <button type="submit" class="btn btn-save">
-                บันทึกบทความ
+                อัปเดตบทความ
             </button>
         </div>
     </form>

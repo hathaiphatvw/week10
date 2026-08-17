@@ -29,7 +29,6 @@ class AdminController extends Controller
     {
         return view('form');
     }
-    
 
     // บันทึกบทความใหม่
     public function insert(Request $request)
@@ -44,24 +43,67 @@ class AdminController extends Controller
         ]);
 
         $data = [
-            'title' => $request->title,
+            'title'   => $request->title,
             'content' => $request->content,
-            'status' => 1,
+            'status'  => 1,
         ];
 
         DB::table('blogs')->insert($data);
 
-        return redirect('/blogs');
+        return redirect()->route('blogs')->with('success', 'เพิ่มบทความใหม่เรียบร้อยแล้ว');
     }
 
     // ลบบทความตาม ID
     public function delete($id)
     {
-       function delete($id)
-{
-    DB::table("blogs")->where('id', $id)->delete();
-    return redirect('/blog');
-}
+        DB::table('blogs')->where('id', $id)->delete();
+
+        return redirect()->route('blogs')->with('success', 'ลบบทความเรียบร้อยแล้ว');
+    }
+
+    // สลับสถานะบทความ (เผยแพร่ <-> ฉบับร่าง)
+    public function change($id)
+    {
+        $blog = DB::table("blogs")->where('id', $id)->first();
+
+        if ($blog) {
+            $data = [
+                'status' => !$blog->status
+            ];
+
+            DB::table("blogs")->where('id', $id)->update($data);
+        }
+
+        return redirect()->route('blogs')->with('success', 'เปลี่ยนสถานะบทความเรียบร้อยแล้ว');
+    }
+
+    // แสดงฟอร์มแก้ไขบทความ
+    public function edit($id)
+    {
+        $blog = DB::table('blogs')->where('id', $id)->first();
+
+        return view('edit', compact('blog'));
+    }
+
+    // บันทึกการแก้ไขบทความ
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|min:3',
+            'content' => 'required',
+        ], [
+            'title.required' => 'กรุณากรอกชื่อบทความ',
+            'title.min' => 'ชื่อบทความต้องไม่ต่ำกว่า 3 ตัวอักษร',
+            'content.required' => 'กรุณากรอกเนื้อหาบทความ',
+        ]);
+
+        $data = [
+            'title'   => $request->title,
+            'content' => $request->content,
+        ];
+
+        DB::table('blogs')->where('id', $id)->update($data);
+
+        return redirect()->route('blogs')->with('success', 'บันทึกการแก้ไขบทความเรียบร้อยแล้ว');
     }
 }
-
